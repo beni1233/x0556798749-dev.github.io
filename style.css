@@ -27,6 +27,9 @@ td:focus {
     background-color: #fff9c4;
     outline: 2px solid #ffc107;
 }
+.toData {
+    background-color: red;
+}
 
 button {
     padding: 10px 20px;
@@ -39,9 +42,4 @@ button {
 
     button:hover {
         background-color: #218838;
-    }
-
-    .toData{
-        background-color: red;
-
     }
