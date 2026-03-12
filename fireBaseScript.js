@@ -13,11 +13,14 @@ import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstati
 import { initializeFirestore, getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
 const app = initializeApp(firebaseConfig);
+const dataBase = getFirestore(app);
 
-/*const dataBase = getFirestore(app);*/
-const dataBase = initializeFirestore(app, {
-    experimentalForceLongPolling: true,
-});
+//const dataBase = initializeFirestore(app, {
+//    experimentalForceLongPolling: true,
+//});
+
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
 
 window.saveData = async function (dataObject, Collection, DocumentData) {
     try {
@@ -51,3 +54,43 @@ window.loadData = async function (Collection, DocumentData) {
         return null;
     }
 }
+
+
+// פונקציית התחברות
+window.loginWithGoogle = async function () {
+    try {
+        const result = await signInWithPopup(auth, provider);
+        console.log("מחובר בהצלחה:", result.user);
+    } catch (error) {
+        console.error("שגיאה בהתחברות:", error);
+        alert("נכשל בהתחברות");
+    }
+}
+
+// פונקציית התנתקות
+window.logout = function () {
+    auth.signOut();
+}
+
+// האזנה לשינויים במצב המשתמש (מחובר/מנותק)
+auth.onAuthStateChanged((user) => {
+    const loginBtn = document.getElementById('login-btn');
+    const userInfo = document.getElementById('user-info');
+    const userPhoto = document.getElementById('user-photo');
+    const userName = document.getElementById('user-name');
+
+    if (user) {
+        // המשתמש מחובר
+        loginBtn.style.display = 'none';
+        userInfo.style.display = 'flex';
+        userPhoto.src = user.photoURL;
+        userName.innerText = user.displayName;
+
+        // כאן ניתן גם לעדכן את ה-userID הגלובלי אם תרצה
+        if (typeof userID !== 'undefined') userID = user.uid;
+    } else {
+        // המשתמש מנותק
+        loginBtn.style.display = 'block';
+        userInfo.style.display = 'none';
+    }
+});
