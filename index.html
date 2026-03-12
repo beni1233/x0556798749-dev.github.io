@@ -6,6 +6,8 @@
 <title>ישיבת מן ההר — CRM Pro</title>
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@200;300;400;700;900&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
 <script src="data_script.js"></script>
 <script type="module" src="fireBaseScript.js"></script>
 <style>
@@ -576,7 +578,7 @@ body::before {
 
 <!-- SIDEBAR -->
 <aside class="sidebar">
-  <div class="sidebar-logo">ש</div>
+  <div class="sidebar-logo" id="userLogo">ש</div>
   <button class="nav-btn active" onclick="showView('dashboard',this)">
     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5" stroke-width="1.8"/><rect x="14" y="3" width="7" height="7" rx="1.5" stroke-width="1.8"/><rect x="3" y="14" width="7" height="7" rx="1.5" stroke-width="1.8"/><rect x="14" y="14" width="7" height="7" rx="1.5" stroke-width="1.8"/></svg>
     <span class="tip">דאשבורד</span>
@@ -601,32 +603,26 @@ body::before {
 
   <!-- TOPBAR -->
   <div class="topbar">
-    <span class="topbar-title" id="topbar-title">דאשבורד ניהול</span>
-    <div class="search-box">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" stroke-width="1.8" /><path d="m21 21-4.35-4.35" stroke-linecap="round" stroke-width="1.8" /></svg>
-        <input id="search-input" placeholder="חיפוש שם, טלפון..." oninput="onSearch(this.value)">
-    </div>
+      <span class="topbar-title" id="topbar-title">דאשבורד ניהול</span>
+      <div class="search-box">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" stroke-width="1.8" /><path d="m21 21-4.35-4.35" stroke-linecap="round" stroke-width="1.8" /></svg>
+          <input id="search-input" placeholder="חיפוש שם, טלפון..." oninput="onSearch(this.value)">
+      </div>
       <!-- USER_AUTH -->
-    <div id="auth-container" style="display: flex; align-items: center; gap: 10px;">
-        <button id="login-btn" class="btn btn-gold btn-sm" onclick="loginWithGoogle()">התחבר עם Google</button>
+      <button id="authBtn" class="btn btn-gold">התחבר עם Google</button>
 
-        <div id="user-info" style="display: none; align-items: center; gap: 10px;">
-            <span id="user-name" style="font-size: 12px; font-weight: 700;"></span>
-            <img id="user-photo" src="" alt="פרופיל" style="width: 35px; height: 35px; border-radius: 50%; border: 2px solid var(--gold);">
-            <button class="btn btn-ghost btn-sm" onclick="logout()">התנתק</button>
-        </div>
-    </div>
+      <button class="btn btn-gold btn-sm" onclick="openAddModal()">+ תורם חדש</button>
+      <button class="btn btn-ghost btn-sm" onclick="exportCSV()">📊 CSV</button>
+      <button class="btn btn-ghost btn-sm" onclick="openImportPicker()"><span>📊</span>ייבוא מאקסל</button>
 
-    <button class="btn btn-gold btn-sm" onclick="openAddModal()">+ תורם חדש</button>
-    <button class="btn btn-ghost btn-sm" onclick="exportCSV()">📊 CSV</button>
       <!---JSON---->
-    <div style="display: flex; gap: 8px; align-items: center;">
-        <span style="font-size: 0.9rem; font-weight: bold;">ניהול נתונים:</span>
-        <button class="btn btn-outline btn-sm" onclick="userSave()">גיבוי ענן</button>
-        <button class="btn btn-outline btn-sm" onclick="userLoad()">טעינה מענן</button>
-        <button class="btn btn-ghost btn-sm" onclick="exportToJSON(donors)">ייצוא קובץ</button>
-        <button class="btn btn-ghost btn-sm" onclick="openJSONFilePicker()">ייבוא קובץ</button>
-    </div>
+      <div style="display: flex; gap: 8px; align-items: center;">
+          <span style="font-size: 0.9rem; font-weight: bold;">ניהול נתונים:</span>
+          <button class="btn btn-outline btn-sm" onclick="userSave()">גיבוי ענן</button>
+          <button class="btn btn-outline btn-sm" onclick="userLoad()">טעינה מענן</button>
+          <button class="btn btn-ghost btn-sm" onclick="exportToJSON(donors)">ייצוא קובץ</button>
+          <button class="btn btn-ghost btn-sm" onclick="openJSONFilePicker()">ייבוא קובץ</button>
+      </div>
   </div>
 
   <div class="content">
@@ -913,6 +909,34 @@ body::before {
   </div>
 </div>
 
+<div id="mapping-modal" class="modal-overlay">
+    <div class="modal">
+        <div class="modal-header">
+            <div class="modal-avatar">CSV</div>
+            <div>
+                <h2 class="modal-title">מיפוי שדות יבוא</h2>
+                <p class="modal-subtitle">שייך את עמודות הקובץ לשדות המערכת</p>
+            </div>
+            <button class="modal-close" onclick="closeMappingModal()">×</button>
+        </div>
+        <div class="modal-body" style="padding: 20px;">
+            <table id="mapping-table" class="contacts-table">
+                <thead>
+                    <tr>
+                        <th>שדה יעד</th>
+                        <th>עמודה בקובץ</th>
+                    </tr>
+                </thead>
+                <tbody id="mapping-body">
+                </tbody>
+            </table>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-ghost" onclick="closeMappingModal()">ביטול</button>
+            <button class="btn btn-gold" onclick="processImport()">בצע יבוא</button>
+        </div>
+    </div>
+</div>
 <script>
 // ── DATA ──────────────────────────────────────────────────
 let donors = [

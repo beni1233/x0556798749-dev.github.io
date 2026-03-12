@@ -72,25 +72,27 @@ window.logout = function () {
     auth.signOut();
 }
 
-// האזנה לשינויים במצב המשתמש (מחובר/מנותק)
-auth.onAuthStateChanged((user) => {
-    const loginBtn = document.getElementById('login-btn');
-    const userInfo = document.getElementById('user-info');
-    const userPhoto = document.getElementById('user-photo');
-    const userName = document.getElementById('user-name');
+// מאזין לשינויי מצב המשתמש
+onAuthStateChanged(auth, (user) => {
+    const userLogo = document.getElementById('userLogo');
+    const authBtn = document.getElementById('authBtn');
 
     if (user) {
-        // המשתמש מחובר
-        loginBtn.style.display = 'none';
-        userInfo.style.display = 'flex';
-        userPhoto.src = user.photoURL;
-        userName.innerText = user.displayName;
+        // משתמש מחובר
+        if (user.photoURL) {
+            userLogo.innerHTML = `<img src="${user.photoURL}" style="width:100%; height:100%; border-radius:14px; object-fit:cover;">`;
+        } else {
+            userLogo.innerText = user.displayName ? user.displayName.charAt(0) : "U";
+        }
 
-        // כאן ניתן גם לעדכן את ה-userID הגלובלי אם תרצה
-        if (typeof userID !== 'undefined') userID = user.uid;
+        authBtn.innerText = "התנתק";
+        authBtn.onclick = window.logout;
+        console.log("User logged in:", user.displayName);
     } else {
-        // המשתמש מנותק
-        loginBtn.style.display = 'block';
-        userInfo.style.display = 'none';
+        // משתמש לא מחובר
+        userLogo.innerHTML = "?"; // ברירת מחדל
+        authBtn.innerText = "התחבר עם Google";
+        authBtn.onclick = window.loginWithGoogle;
+        console.log("User logged out");
     }
 });
