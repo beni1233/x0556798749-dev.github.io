@@ -1,0 +1,55 @@
+﻿<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ניהול נתונים - טבלה עריכה</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>ניהול רשימת אנשי קשר</h1>
+        <p>לחץ על כל תא בטבלה כדי לערוך את התוכן שלו.</p>
+    </header>
+
+    <main>
+        <table id="data-table">
+            <thead>
+                <tr>
+                    <th>שם</th>
+                    <th>שם משפחה</th>
+                    <th>כתובת</th>
+                    <th>מספר טלפון</th>
+                    <th>מייל</th>
+                    <th>קשר לישיבה</th>
+                    <th>בוגר</th>
+                    <th>מחזור</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td contenteditable="true">ישראל</td>
+                    <td contenteditable="true">ישראלי</td>
+                    <td contenteditable="true">רחוב הרצל 1, ירושלים</td>
+                    <td contenteditable="true">050-1234567</td>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="date"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <br>
+        <button onclick="addRow()">➕ הוסף שורה חדשה</button>
+        <button onclick="userSave()">שמור בבסיס הנתונים</button>
+        <br><br>
+        <a href="index.html">חזרה לדף הבית</a>
+    </main>
+
+    <script src="data_script.js"></script>
+    <script type="module" src="fireBaseScript.js"></script>
+</body>
+</html>
