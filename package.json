@@ -1,0 +1,24 @@
+{
+  "name": "beni-x0556798749",
+  "version": "1.0.0",
+  "description": "",
+  "main": "data_script.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/beni1233/x0556798749-dev.github.io.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/beni1233/x0556798749-dev.github.io/issues"
+  },
+  "homepage": "https://github.com/beni1233/x0556798749-dev.github.io#readme",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
